@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const User = require('./database/models/user')
 
 const mongoDB = 'mongodb://127.0.0.1:27017/QLKH';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true})

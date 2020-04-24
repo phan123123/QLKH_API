@@ -29,13 +29,14 @@ router.all('/', function (req, res) {
 
 //get token for register
 global.getAcceptToken = (adminData, res) => {
-    let user = await User.findOne({'userName'=adminData.userName, 'passWord'=adminData.passWord})
-    if(user.isAdmin){
-        res.status(200).json({token : token})
-    }
-    else{
-        res.status(403).json({error: "You aren't admin!!"})
-    }
+    User.findOne({userName : adminData.userName, passWord : adminData.passWord}, (err,user)=>{
+        if(user.isAdmin){
+            res.status(200).json({token : token})
+        }
+        else{
+            res.status(403).json({error: "You aren't admin!!"})
+        }
+    });
 }
 
 module.exports = router;
