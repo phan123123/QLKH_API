@@ -7,7 +7,7 @@ var detailSchema = mongoose.Schema({
 },{ _id : false },{versionKey: false })
 
 let exportSchema = new mongoose.Schema({
-    time: Date,
+    time: {type: Date, default: Date.now},
     detail: [detailSchema],
     user: {type : mongoose.Schema.Types.ObjectId, ref: 'User'}
 },{versionKey: false })

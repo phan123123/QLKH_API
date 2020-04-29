@@ -6,17 +6,19 @@ router.use(bodyParser.urlencoded({
     extended: true
 }));
 router.use(bodyParser.json());
-var User = require('../models/Export');
+var Export = require('../models/Export');
+var User = require('../models/User');
+var Production = require('../models/Production');
 var ObjectID = require('mongoose').Types.ObjectId;
 
 //control the request
-router.all('/export', function(req, res) {
+router.all('/', function(req, res) {
     //get the action and call
     let action = req.body.action.trim()
     if (action in global && typeof global[action] === "function") {
         global[action](req.body, res);
     }
-    // function ís not exist
+    // function is not exist
     else {
         res.status(400).json({
             error: "Don't have this feature!!"
@@ -25,34 +27,93 @@ router.all('/export', function(req, res) {
 });
 
 //add new export event
-global.addNewExport = (data, res) => {
+global.addNewExportation = (data, res) => {
     // check tokenLogin
-    User.findOne({
-        _id: new ObjectID(data.tokenLogin)
-    }, (err, user) => {
-        if(err){
+    User.findById(new ObjectID(data.tokenLogin), (err, user) => {
+        if (err) {
+            res.status(400).json({
+                error: "Data wrong!!"
+            })
             console.error("Error when read object from db!!");
-        }
-        else{
+        } else {
             if (user) {
-                //return tokenRegister if user is admin
-                if(user.isAdmin){
-                    res.status(200).json({
-                        tokenRegister: tokenRegister
+                var dataArray = []
+                var suggested = true
+                for (let i in data.detail) {
+                    Production.findById(new ObjectID(i.production), (err, production) => {
+                        if (err || !production) {
+                            res.status(403).json({
+                                error: "Data wrong!!"
+                            })
+                            suggested = false
+                            break
+                        } else {
+                            dataArray.pust({
+                                production: production._id,
+                                number: i.number,
+                                price: production.price
+                            });
+                        }
                     })
                 }
-                else {
-                    res.status(403).json({
-                        error: "You aren't admin!!"
+                if (suggested) {
+                    Export.create({
+                        detail: dataArray,
+                        user: new ObjectID(data.tokenLogin)
+                    }, (err, user) => {
+                        if (err) {
+                            res.status(403).json({
+                                error: "Create error!!"
+                            })
+                        } else {
+                            res.status(200).json({
+                                suggest: "Create suggested!!"
+                            })
+                        }
                     })
                 }
             } else {
                 res.status(403).json({
-                    error: "User not exist!!"
+                    error: "tokenLogin wrong!!"
                 })
             }
         }
     });
 }
 
+//find exportation
+global.findExportation = (data, res) => {
+    User.findById(new ObjectID(data.tokenLogin), (err, user) => {
+        if (err) {
+            res.status(400).json({
+                error: "Data wrong!!"
+            })
+        } else {
+            if (user) {
+                Export.find({
+                    time: {
+                        $gte: data.from,
+                        $lte: data.to
+                    }
+                }, '_id time detail', (err, exportations) => {
+                    if (err) {
+                        res.status(400).json({
+                            error: "Data wrong!!"
+                        })
+                    } else {
+                        res.status(200).json({data: exportations.toJSON()})
+                    }
+                })
+            } else {
+                res.status(403).json({
+                    error: "tokenLogin wrong!!"
+                })
+            }
+        }
+    });
+}
+
+global.statisticsExport = (data, res) => {
+
+}
 module.exports = router;

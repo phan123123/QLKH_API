@@ -14,8 +14,8 @@ User.create({
 });
 */
 Production.create({
-    productionName: "test2",
-    detail: "test2",
+    productionName: "test3",
+    detail: "test3",
     price: 30
 }, (err, user) => {
     if(err){

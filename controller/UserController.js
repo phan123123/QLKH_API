@@ -19,7 +19,7 @@ for (var i = 0; i < 16; i++) {
 }
 
 //control the request
-router.all('/user', function(req, res) {
+router.all('/', function(req, res) {
     //get the action and call
     let action = req.body.action.trim()
     if (action in global && typeof global[action] === "function") {
@@ -34,13 +34,16 @@ router.all('/user', function(req, res) {
 });
 
 //get token for register new user
-global.getAcceptToken = (adminData, res) => {
+global.getRegisterToken = (adminData, res) => {
     // check is admin?
     User.findOne({
         userName: adminData.userName,
         passWord: sha1(adminData.passWord)
     }, (err, user) => {
         if(err){
+            res.status(400).json({
+                error: "Data wrong!!"
+            })
             console.error("Error when read object from db!!");
         }
         else{
@@ -107,7 +110,8 @@ global.login = (userData, res) => {
         if (user) {
             //return tokenLogin
             res.status(200).json({
-                tokenLogin: user._id.toString()
+                tokenLogin: user._id.toString(),
+                isAdmin: user._id.isAdmin
             })
         } else {
             res.status(403).json({
@@ -119,21 +123,18 @@ global.login = (userData, res) => {
 
 //add a new admin from user
 global.addAdmin = (userData, res) => {
-    User.findOne({
-        userName: userData.userName,
-        passWord: sha1(userData.passWord)
-    }, (err, admin) => {
+    User.findById(new ObjectID(userData.tokenLogin), (err, admin) => {
         if (admin) {
             if(!admin.isAdmin){
                 res.json({error: "You are not admin!!"})
             }
             else{
-                User.findByIdAndUpdate(new ObjectID(userData.tokenLogin), {isAdmin : true}, (err, user) => {
+                User.findByIdAndUpdate(new ObjectID(userData.tokenAccount), {isAdmin : true}, (err, user) => {
                     if(err||!user){
                         res.status(403).json({error: "tokenLogin wrong!!"})
                     }
                     else{
-                        res.status(200).json({tokenLogin: user._id.toString()})
+                        res.status(200).json({suggest: "Add admin suggested!!"})
                     }
                 });
             }
