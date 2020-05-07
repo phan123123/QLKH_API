@@ -36,7 +36,8 @@ global.createProduction = async (data, res) => {
             await Production.create({
                 productionName: data.productionName,
                 detail: data.detail,
-                price: data.price
+                price: data.price,
+                number: data.number
             })
             res.status(200).json({
                 suggest: "Created this production!!"
@@ -62,7 +63,8 @@ global.editProduction = async (data, res) => {
             var obj = await Production.findByIdAndUpdate(new ObjectID(data.production), {
                 productionName: data.productionName,
                 detail: data.detail,
-                price: data.price
+                price: data.price,
+                number: data.number
             })
             if (obj) {
                 res.status(200).json({

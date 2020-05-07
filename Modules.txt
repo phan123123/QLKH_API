@@ -1,0 +1,5 @@
+/user 		- đăng nhập, đăng kí, thêm quyền
+/export		- tìm kiếm, sửa, thêm, thống kê giao dịch xuât kho
+/import		- tìm kiếm, sửa, thêm, thống kê giao dịch nhập kho
+/production	- thêm, sửa, tìm kiếm các loại hàng hóa
+/producer	- thêm, sửa, tìm kiếm các nhà sản xuất

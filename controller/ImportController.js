@@ -7,7 +7,7 @@ router.use(bodyParser.urlencoded({
 }));
 router.use(bodyParser.json());
 var User = require('../models/User');
-var Export = require('../models/Export');
+var Import = require('../models/Import');
 var Production = require('../models/Production');
 var ObjectID = require('mongoose').Types.ObjectId;
 
@@ -32,8 +32,8 @@ router.all('/', function(req, res) {
 });
 
 
-//add new Exportation
-global.createExportation = async (data, res) => {
+//add new importation
+global.createImportation = async (data, res) => {
     var user = await User.findById(new ObjectID(data.tokenLogin))
     if (user) {
         var detail = []
@@ -48,13 +48,6 @@ global.createExportation = async (data, res) => {
                     number: dat.number,
                     price: production.price
                 });
-                if(production.numer < dat.number){
-                    flag = false
-                    res.status(403).json({
-                        error: `Production ${dat.production} is not enough!!`
-                    })
-                    break
-                }
             } else {
                 flag = false
                 res.status(403).json({
@@ -64,14 +57,14 @@ global.createExportation = async (data, res) => {
             }
         }
         if (flag) {
-            await Export.create({
+            await Import.create({
                 detail: detail,
                 user: new ObjectID(data.tokenLogin)
             });
             for (let i in details) {
                 let dat = data.detail[i]
                 Production.findByIdAndUpdate(new ObjectID(dat.production), {
-                    $dec: {
+                    $inc: {
                         number: dat.number
                     }
                 }, (err, obj) => {
@@ -81,7 +74,7 @@ global.createExportation = async (data, res) => {
                 })
             }
             res.status(200).json({
-                suggest: "Created Exportation!!"
+                suggest: "Created importation!!"
             })
         }
     } else {
@@ -92,7 +85,7 @@ global.createExportation = async (data, res) => {
 }
 
 //get a statistic in a time
-global.findExportation = async (data, res) => {
+global.findImportation = async (data, res) => {
     var user = await User.findById(new ObjectID(data.tokenLogin))
     if (user) {
         let field ='_id time detail'
@@ -103,7 +96,7 @@ global.findExportation = async (data, res) => {
         let to = new Date(data.to.toString().replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"));
         // from.setDate(from.getDate()+1)
         to.setDate(to.getDate()+1)
-        let dataArray = await Export.find({
+        let dataArray = await Import.find({
             time: {
                 $gte: from,
                 $lt: to

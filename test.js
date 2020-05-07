@@ -16,7 +16,8 @@ User.create({
 Production.create({
     productionName: "test3",
     detail: "test3",
-    price: 30
+    price: 30,
+    number: 20
 }, (err, user) => {
     if(err){
         console.error(err);

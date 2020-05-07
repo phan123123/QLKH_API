@@ -1,0 +1,6 @@
+users(_id, userName, passWord, isAdmin)
+producers(_id, name, detail, {id_production})
+groups(_id, name, detail, {id_production})
+productions(_id, name, detail, price)
+imports(_id, time, {id_production, number, price}, _id_user)
+exports(_id, time, {id_production, number, price}, _id_user)

@@ -84,7 +84,8 @@ global.register = (userData, res) => {
                 }, (err, user) => {
                     //return tokenLogin
                     res.status(200).json({
-                        tokenLogin: user._id.toString()
+                        tokenLogin: user._id.toString(),
+                        isAdmin: user.isAdmin
                     })
                 });
             } else {
@@ -111,7 +112,7 @@ global.login = (userData, res) => {
             //return tokenLogin
             res.status(200).json({
                 tokenLogin: user._id.toString(),
-                isAdmin: user._id.isAdmin
+                isAdmin: user.isAdmin
             })
         } else {
             res.status(403).json({
